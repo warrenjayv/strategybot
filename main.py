@@ -12,12 +12,18 @@ class MyClient(discord.Client):
     #~parameters
     storage = []
     counter = 0
+    isActive = 0 
 
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
  
     async def on_message(self, message):
-
+        
+        #~isActive
+        if self.isActive == 1:
+            print("currently active")
+            return
+            
         #~store message
         print('Message from {0.author}: {0.content}'.format(message))
         self.storage.append('sniped: `{0.author}`: `{0.content}`'.format(message))
@@ -35,6 +41,8 @@ class MyClient(discord.Client):
             await message.channel.send(self.storage[0])
 
         if message.content.startswith('st_ attack'):
+
+            self.isActive = 1
 
             genlt = general()
 
@@ -74,6 +82,7 @@ class MyClient(discord.Client):
             await plot.edit(content=end)
             genlt.clear_users()
             genlt.reset()
+            self.isActive = 0
 
 
 client = MyClient()
