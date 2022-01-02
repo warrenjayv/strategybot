@@ -1,5 +1,5 @@
 # strategybot
 strategy bot for discord
 
-+ commands
+* commands
 + ~ st_ attack <user>
