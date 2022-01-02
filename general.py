@@ -157,16 +157,16 @@ class general:
             
     def set_user(self, author, mention ):
         for i in range(0x6):
+            try:
+                 #mentioned
+                self.usr2[i] = mention[i]
+                self.plot[i + self.B + 1] = self.usr2[i]
 
-            #mentioned
-            self.usr2[i] = mention[i]
-            self.plot[i + self.B + 1] = self.usr2[i]
-
-            #author
-            self.usr1[i] = author[i]
-            self.plot[i + self.A] = self.usr1[i]
-
-        self.set_action()
+                #author
+                self.usr1[i] = author[i]
+                self.plot[i + self.A] = self.usr1[i]
+            except:
+                return
 
     def clear_users(self):
         for i in range(0x6):
