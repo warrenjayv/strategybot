@@ -29,13 +29,13 @@ class MyClient(discord.Client):
             self.storage.clear
             self.counter = 0
 
-        if message.content.startswith('st_ about'):
+        if message.content.startswith('st_about'):
             await message.channel.send("`strategybot is a turn based, player vs player ancient battle on discord!`")
 
-        if message.content.startswith('st_ snipe'):
+        if message.content.startswith('st_snipe'):
             await message.channel.send(self.storage[0])
 
-        if message.content.startswith('st_ attack'):
+        if message.content.startswith('st_attack') or message.content.startswith('st_ attack'):
 
             #~notify
             if self.isActive == 1:
