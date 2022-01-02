@@ -19,11 +19,6 @@ class MyClient(discord.Client):
  
     async def on_message(self, message):
         
-        #~isActive
-        if self.isActive == 1:
-            print("currently active")
-            return
-
         #~store message
         print('Message from {0.author}: {0.content}'.format(message))
         self.storage.append('sniped: `{0.author}`: `{0.content}`'.format(message))
@@ -42,6 +37,11 @@ class MyClient(discord.Client):
 
         if message.content.startswith('st_ attack'):
 
+            #~notify
+            if self.isActive == 1:
+                await message.channel.send("`a battle is ongoing; please try again later. =[`")
+                return
+ 
             self.isActive = 1
 
             genlt = general()
