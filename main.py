@@ -7,9 +7,6 @@ import time
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
 
-genlt = general()
-
-
 class MyClient(discord.Client):
   
     #~parameters
@@ -20,7 +17,7 @@ class MyClient(discord.Client):
         print('Logged on as {0}!'.format(self.user))
  
     async def on_message(self, message):
-    
+
         #~store message
         print('Message from {0.author}: {0.content}'.format(message))
         self.storage.append('sniped: `{0.author}`: `{0.content}`'.format(message))
@@ -30,8 +27,6 @@ class MyClient(discord.Client):
         if self.counter > 2:
             self.storage.clear
             self.counter = 0
-           
-        print("counter: {}".format(self.counter))
 
         if message.content.startswith('st_ about'):
             await message.channel.send("`strategybot is a turn based, player vs player ancient battle on discord!`")
@@ -40,28 +35,43 @@ class MyClient(discord.Client):
             await message.channel.send(self.storage[0])
 
         if message.content.startswith('st_ attack'):
+
+            genlt = general()
+
             # ~ steps ~
             x = 0 
-
+            
+            plot = ''
+            
             # ~ set users ~
             mention  = message.mentions[0].display_name
             author   = message.author.name
             genlt.set_user(author , mention)
             genlt.go_defend()
          
-            for i in range(12):
-                if x < 15:
+            while (genlt.health1 > 0) and (genlt.health2 > 0):
+                  
+                genlt.set_health()
+                
+                if x < 12:
                     genlt.go_attack(x, 1)
-                    x += 1
+
+                if x > 12:
+                    genlt.do_battle() 
 
                 land = ' '.join(str(v) for v in genlt.plot)
-                if (i < 1):
+                if (x < 1):
                     plot = await message.channel.send('{}'.format(land))
                 else:
                     await plot.edit(content=land)
                     
                 time.sleep(1)
 
+                x += 1
+
+            genlt.conclude()
+            end = ' '.join(str(v) for v in genlt.plot)
+            await plot.edit(content=end)
             genlt.clear_users()
             genlt.reset()
 

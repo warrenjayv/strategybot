@@ -1,19 +1,23 @@
 from asyncio.events import Handle
+from math import expm1
+from os import dup2
+from time import daylight
 import discord
+import random
 
 class general:
     #~properties
     usr1 = [0] * 0x6
     usr2 = [0] * 0x6
     
-    health1 = 0x3E8
-    health2 = 0x3E8 
+    health1 = 1000
+    health2 = 1000
 
     #~units
     trp = [ '░', '░' ]
     
     #~land
-    acres = 0x8c       #plot size
+    acres = 0xB4       #plot size
     plot = [0] * acres #plot
     area1 = 0x0        #player 1 area
     area2 = 0xA        #player 2 area 
@@ -35,6 +39,7 @@ class general:
     attack = "attacking"
     defend = "defending"
     march  = "marching"
+    defeat = "defeated"
 
     #~initial
     def __init__(self):
@@ -43,6 +48,71 @@ class general:
             if i%0x14 == 0:
                 self.plot[i] = '\n'
 
+    def set_health(self):
+
+        h1 = '{}'.format(self.health1)
+        h2 = '{}'.format(self.health2)
+     
+        #~clear first
+        for j in range(0x5):
+            self.plot [ 0x5 + self.C + self.area1 + j] = '_'
+            self.plot [ 0x5 + self.C + self.area2 + j] = '_'
+        
+        #~setter
+        for i in range(len(h1)):
+            self.plot [ 0x5 + self.C + self.area1 + i ] = h1[i]
+        for k in range(len(h2)):
+            self.plot [ 0x5 + self.C + self.area2 + k ] = h2[k]
+        
+    #~battle
+    def do_battle(self):
+
+        #~dices for user1
+        D1 =   random.randint(0, 20)
+        E1 =   random.randint(0, 20)
+        F1 =   random.randint(0, 20)
+        G1 =   random.randint(0, 20) 
+
+        #~dices for user2
+        D2 =   random.randint(0, 20)
+        E2 =   random.randint(0, 20)
+        F2 =   random.randint(0, 20)
+        G2 =   random.randint(0, 20)
+
+
+        #~apply damage
+        self.health1 -= D2
+        self.health1 -= E2
+        self.health1 -= F2
+        self.health1 -= G2
+
+        self.health2 -= D1
+        self.health2 -= E1
+        self.health2 -= F1
+        self.health2 -= G1
+
+        self.plot [ 0x5 + self.D + self.area2 ] = str(D1)
+        self.plot [ 0x5 + self.E + self.area2 ] = str(E1)   
+        self.plot [ 0x5 + self.F + self.area2 ] = str(F1)
+        self.plot [ 0x5 + self.G + self.area2 ] = str(G1)
+
+        self.plot [ 0x6 + self.D + self.area2 ] = str(D2)
+        self.plot [ 0x6 + self.E + self.area2 ] = str(E2)
+        self.plot [ 0x6 + self.F + self.area2 ] = str(F2)
+        self.plot [ 0x6 + self.G + self.area2 ] = str(G2)
+
+    #~conclude
+    def conclude( self ):
+        if (self.health1 > self.health2):
+            end ="attacker won !".format(self.usr1)
+        else:
+            end ="defender won !".format(self.usr2)
+
+        print(end)
+        
+        for i in range(len(end)):
+            self.plot[0x8D + self.area1 + i + 1] = end[i]
+    
     #~attack
     def go_attack(self, i, offset):
             self.plot[offset + i + self.D + 1] = self.trp[0]
@@ -61,15 +131,15 @@ class general:
             
     def go_defend(self):
 
-                self.plot[ 0x8 + self.D + self.area2 ] = self.trp[0]
-                self.plot[ 0x8 + self.E + self.area2 ] = self.trp[0]
-                self.plot[ 0x8 + self.F + self.area2 ] = self.trp[0]
+                self.plot[ 0x9 + self.D + self.area2 ] = self.trp[0]
+                self.plot[ 0x9 + self.E + self.area2 ] = self.trp[0]
+                self.plot[ 0x9 + self.F + self.area2 ] = self.trp[0]
                 self.plot[ 0x8 + self.G + self.area2 ] = self.trp[0]                
 
     def set_action(self):
 
-        start1 = 0x7 + self.A
-        start2 = 0x7 + self.B 
+        start1 = 0x8 + self.A
+        start2 = 0x8 + self.B 
         length = len(self.attack)
 
         j = 0
@@ -84,18 +154,14 @@ class general:
             
     def set_user(self, author, mention ):
         for i in range(0x6):
-            if i == 0:
-                temp = 1
-            else:
-                temp = 0
 
             #mentioned
             self.usr2[i] = mention[i]
-            self.plot[i + self.B + temp] = self.usr2[i]
+            self.plot[i + self.B + 1] = self.usr2[i]
 
             #author
             self.usr1[i] = author[i]
-            self.plot[i + self.A + temp] = self.usr1[i]
+            self.plot[i + self.A] = self.usr1[i]
 
         self.set_action()
 
@@ -109,6 +175,7 @@ class general:
             self.plot[i] = '_'
             if i%0x14 == 0:
                self.plot[i] = '\n'
+
 
 #  plot (x2)
 #       ----- zone 0 ------     ----- zone 1 ------
