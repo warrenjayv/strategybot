@@ -48,6 +48,9 @@ class general:
             if i%0x14 == 0:
                 self.plot[i] = '\n'
 
+    def __del__(self):
+        print("general terminated.")
+        
     def set_health(self):
 
         h1 = '{}'.format(self.health1)

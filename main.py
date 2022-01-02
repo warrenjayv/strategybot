@@ -23,7 +23,7 @@ class MyClient(discord.Client):
         if self.isActive == 1:
             print("currently active")
             return
-            
+
         #~store message
         print('Message from {0.author}: {0.content}'.format(message))
         self.storage.append('sniped: `{0.author}`: `{0.content}`'.format(message))
@@ -83,7 +83,7 @@ class MyClient(discord.Client):
             genlt.clear_users()
             genlt.reset()
             self.isActive = 0
-
+            
 
 client = MyClient()
 client.run(TOKEN)
