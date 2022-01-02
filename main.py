@@ -55,11 +55,11 @@ class MyClient(discord.Client):
             mention  = message.mentions[0].display_name
             author   = message.author.name
             genlt.set_user(author , mention)
+            genlt.set_action()
             genlt.go_defend()
          
             while (genlt.health1 > 0) and (genlt.health2 > 0):
                   
-                genlt.set_health()
                 
                 if x < 12:
                     genlt.go_attack(x, 1)
@@ -73,10 +73,11 @@ class MyClient(discord.Client):
                 else:
                     await plot.edit(content=land)
                     
+                genlt.set_health()
                 time.sleep(1)
 
                 x += 1
-
+ 
             genlt.conclude()
             end = ' '.join(str(v) for v in genlt.plot)
             await plot.edit(content=end)
